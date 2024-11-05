@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.lad1_ph44287_tranngochai.DTO.ProductDTO;
 import com.example.lad1_ph44287_tranngochai.DbHelper.MyDbHelper;
@@ -15,10 +16,16 @@ public class ProductDAO {
     MyDbHelper dbHelper;
     SQLiteDatabase db;
     ProductDTO objCurrentCat = null;
+    Context context;
 
     public ProductDAO(Context context) {
         dbHelper = new MyDbHelper(context);
         db = dbHelper.getWritableDatabase();
+        this.context = context;
+    }
+    public boolean deleteProduct(int productId) {
+        int result = db.delete("tb_product", "id = ?", new String[]{String.valueOf(productId)});
+        return result > 0; // Trả về true nếu xóa thành công
     }
 
     //ham them du lieu
@@ -46,7 +53,7 @@ public class ProductDAO {
                 String name = c.getString(1);
                 Float price = c.getFloat(2);
                 int id_cat = c.getInt(3);
-                ProductDTO objProduct = new ProductDTO(id, price , name, id_cat);
+                ProductDTO objProduct = new ProductDTO(id, name , price, id_cat);
 //                objProduct.setId(id);
 //                objProduct.setName(name);
                 //cho vao list
@@ -74,4 +81,16 @@ public class ProductDAO {
         }
         return objProduct;
     }
+    public boolean updateProduct(ProductDTO product) {
+        ContentValues values = new ContentValues();
+        values.put("name", product.getName());
+        values.put("price", product.getPrice());
+        values.put("id_cat", product.getId_cat());
+//        Toast.makeText(context ,product.getId()+"zzz", Toast.LENGTH_SHORT).show();
+
+        int result = db.update("tb_product", values, "id = ?", new String[]{String.valueOf(product.getId())});
+        return result > 0; // Trả về true nếu cập nhật thành công
+    }
+
+
 }
